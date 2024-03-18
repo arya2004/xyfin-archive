@@ -14,6 +14,7 @@ migrateup:
 migratedown:
 	migrate -path database/migrations -database "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable" -verbose down
 
+sqlc:
+	sqlc generate
 
-
-.PHONY: postgres createdb dropdb migrateup migratedown
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc
