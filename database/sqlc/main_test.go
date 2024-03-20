@@ -16,17 +16,18 @@ const dbDriver = "postgres"
 const dbSource = "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable"
 
 var testQueries *Queries
-
+var testDb *sql.DB
 
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
+	var err error
+	testDb, err = sql.Open(dbDriver, dbSource)
 
 	if err != nil {
 		log.Fatal("cannot connect to database", err)
 	}
 
-	testQueries = New(conn)
+	testQueries = New(testDb)
 
 	//Run the unit tests
 	os.Exit(m.Run())
