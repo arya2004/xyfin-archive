@@ -6,16 +6,20 @@ import (
 
 	"github.com/arya2004/Xyfin/api"
 	database "github.com/arya2004/Xyfin/database/sqlc"
+	"github.com/arya2004/Xyfin/util"
 	_ "github.com/lib/pq"
 )
 
-const dbDriver = "postgres"
-const dbSource = "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable"
-const serverAddress = "0.0.0.0:8081"
 
 
 func main() {
-	conn, err := sql.Open(dbDriver, dbSource)
+
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("Cant load config")
+	}
+
+	conn, err := sql.Open(config.DbDriver, config.DbSource)
 
 	if err != nil {
 		log.Fatal("cannot connect to database", err)
@@ -24,7 +28,7 @@ func main() {
 	store := database.NewStore(conn)
 	server := api.NewServer(store)
 
-	err = server.Start(serverAddress)
+	err = server.Start(config.ServerAddress)
 	if err != nil{
 		log.Fatal("Cant start the server")
 	}
