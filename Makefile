@@ -11,8 +11,15 @@ dropdb:
 migrateup:
 	migrate -path database/migrations -database "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable" -verbose up
 
+migrateup1:
+	migrate -path database/migrations -database "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable" -verbose up 1
+
 migratedown:
 	migrate -path database/migrations -database "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable" -verbose down
+
+migratedown1:
+	migrate -path database/migrations -database "postgresql://root:secret@localhost:5432/xyfin?sslmode=disable" -verbose down 1
+
 
 sqlc:
 	sqlc generate
@@ -26,4 +33,4 @@ server:
 mock:
 	mockgen -package mock_database -destination database/mock/store.go  github.com/arya2004/Xyfin/database/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock 
