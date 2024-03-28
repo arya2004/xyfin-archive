@@ -64,7 +64,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 // checks if token is valid or not. Needed for jwt library
 func (payload *Payload) Valid() error {
 	if time.Now().After(payload.ExpiredAt) {
-		return errors.New("Tokens expired")
+		return errors.New("tokens expired")
 	}
 	return nil
 }

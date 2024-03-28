@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const minSecretKeySize = 64
+const minSecretKeySize = 32
 
 type JWTCreator struct {
 	secretKey string
@@ -16,7 +16,7 @@ type JWTCreator struct {
 
 func NewJWTCreator(secretKey string) (Creator, error) {
 	if len(secretKey) < minSecretKeySize {
-		return nil, fmt.Errorf("Key size should atleast be %d", minSecretKeySize)
+		return nil, fmt.Errorf("key size should atleast be %d", minSecretKeySize)
 	}
 
 	return &JWTCreator{secretKey}, nil
