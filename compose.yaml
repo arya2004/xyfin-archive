@@ -1,3 +1,33 @@
+# version: "3.9"
+# services:
+#   postgres:
+#     image: postgres:14-alpine
+#     environment:
+#       - POSTGRES_USER=root
+#       - POSTGRES_PASSWORD=secret
+#       - POSTGRES_DB=xyfin
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - data-volume:/var/lib/postgresql/data
+#     healthcheck: 
+#       test: "exit 0"
+#   api:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:8080"
+#       - "9090:9090"
+#     environment:
+#       - DB_SOURCE=postgresql://root:secret@postgres:5432/xyfin?sslmode=disable
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+    
+# volumes:
+#   data-volume:
+
 version: "3.9"
 services:
   postgres:
@@ -6,6 +36,8 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=xyfin
+    healthcheck: 
+      test: "exit 0"
   api:
     build:
       context: .
@@ -15,6 +47,7 @@ services:
     environment:
       - DB_SOURCE=postgresql://root:secret@postgres:5432/xyfin?sslmode=disable
     depends_on:
+      postgres:
+        condition: service_healthy
+    links:
       - postgres
-    entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh" ]
-    command: [ "/app/main" ]
