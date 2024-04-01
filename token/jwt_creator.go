@@ -25,14 +25,15 @@ func NewJWTCreator(secretKey string) (Creator, error) {
 
 
 
-func (creator *JWTCreator) CreateToken(username string, duration time.Duration) (string, error){
+func (creator *JWTCreator) CreateToken(username string, duration time.Duration) (string, *Payload, error){
 	payload, err := NewPayload(username, duration)
 	if err != nil {
-		return "", err
+		return "", payload,  err
 	}
 	
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	return jwtToken.SignedString([]byte(creator.secretKey))
+	token,err := jwtToken.SignedString([]byte(creator.secretKey))
+	return token, payload, err
 }
 
 

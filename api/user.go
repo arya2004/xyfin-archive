@@ -8,6 +8,7 @@ import (
 	database "github.com/arya2004/Xyfin/database/sqlc"
 	"github.com/arya2004/Xyfin/util"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -34,8 +35,13 @@ type loginUserRequest struct {
 }
 
 type loginUserResponse struct {
+	SessionID uuid.UUID `json:"session_id"`
 	AccessToken string `json:"access_token"`
+	AccessTokenExpiresAt time.Time  `json:"access_token_expires_at"`
 	User userDto `json:"user"`
+	RefreshToken string `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time  `json:"refresh_token_expires_at"`
+
 
 }
 
@@ -110,7 +116,7 @@ func (server *Server) loginUser(ctx *gin.Context){
 		return
 	}
 
-	accessToken, err := server.tokenCreator.CreateToken(
+	accessToken,accPayload,  err := server.tokenCreator.CreateToken(
 		user.Username,
 		server.configuration.AccessTokenDuration,
 	)
@@ -120,8 +126,38 @@ func (server *Server) loginUser(ctx *gin.Context){
 		return
 	}
 
+	refreshToken, refreshPayload, err := server.tokenCreator.CreateToken(
+		user.Username,
+		server.configuration.RefreshTokenDuration,
+	)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.CreateSession(ctx, database.CreateSessionParams{
+		ID: refreshPayload.ID,
+		Username  : user.Username,
+		RefreshToken: refreshToken,
+		UserAgent : ctx.Request.UserAgent(),
+		ClientIp : ctx.ClientIP(),
+		IsBlocked : false,
+		ExpiresAt : refreshPayload.ExpiredAt,
+	} )
+
+	
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	rsp := loginUserResponse{
+		SessionID: session.ID,
 		AccessToken: accessToken,
+		AccessTokenExpiresAt: accPayload.ExpiredAt,
+		RefreshToken: refreshToken,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
 		User: newUserReponse(user),
 	}
 
