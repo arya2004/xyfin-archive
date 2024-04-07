@@ -26,6 +26,16 @@ func main() {
 	}
 
 	store := database.NewStore(conn)
+	runGRPCServer(config, store)
+}
+
+func runGRPCServer(config util.Configuration, store database.Store){
+	
+	
+}
+
+
+func runGinServer(config util.Configuration, store database.Store){
 	server, err := api.NewServer(config,store)
 
 	if err != nil{
